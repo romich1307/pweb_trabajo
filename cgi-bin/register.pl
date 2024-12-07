@@ -22,5 +22,4 @@ my $sql = "INSERT INTO users (userName, password, firstName, lastName) VALUES (?
 my $sth = $dbh->prepare($sql);
 $sth->execute($userName, $password, $firstName, $lastName);
 
-print $cgi->header(-type => 'text/html');
-print "<p>Usuario registrado exitosamente</p>";
+print $cgi->header(-location => '/index.html');  # Redirigir al inicio
