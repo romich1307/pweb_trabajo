@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  web:
+    build: .
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+    networks:
+      - webnet
+
+  db:
+    build:
+      context: .
+      dockerfile: Dockerfile.db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: pweb1
+      MYSQL_USER: alumno
+      MYSQL_PASSWORD: pweb1
+    ports:
+      - "3306:3306"
+    networks:
+      - webnet
+
+networks:
+  webnet:
+    driver: bridge
