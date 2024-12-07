@@ -4,31 +4,42 @@ use warnings;
 use DBI;
 use CGI;
 
-# Configuración de la base de datos
-my $dsn = "DBI:MariaDB:database=pweb1;host=172.18.0.2";
-my $usuario = "root";
-my $clave = "tu_contraseña";
-my $dbh = DBI->connect($dsn, $usuario, $clave, { RaiseError => 1, AutoCommit => 1 });
-
-# Obtener datos del formulario
+# Recibimos los parámetros de la solicitud
 my $cgi = CGI->new;
-my $userName = $cgi->param('userName');
+my $username = $cgi->param('username');
 my $password = $cgi->param('password');
-my $firstName = $cgi->param('firstName');
-my $lastName = $cgi->param('lastName');
-my $email = $cgi->param('email');  # Capturar el correo electrónico
+my $email = $cgi->param('email');
 
-# Validar que los campos no estén vacíos (opcional, pero recomendado)
-if (!$userName || !$password || !$firstName || !$lastName || !$email) {
-    print $cgi->header(-type => 'text/html');
-    print "<p>Error: Todos los campos son obligatorios.</p>";
-    exit;
+# Configuración de la base de datos
+my $usuario = 'alumno';
+my $clave = 'pweb1';
+my $dsn = "DBI:MariaDB:database=pweb1;host=172.18.0.2";
+my $dbh = DBI->connect($dsn, $usuario, $clave) or die("No se pudo conectar a la base de datos!");
+
+# Comprobamos si el nombre de usuario ya existe
+my $sth = $dbh->prepare("SELECT COUNT(*) FROM Users WHERE username = ?");
+$sth->execute($username);
+my ($exists) = $sth->fetchrow_array;
+
+if ($exists) {
+    # Si el nombre de usuario ya existe, devolvemos un error
+    print $cgi->header('application/xml');
+    print "<response>\n";
+    print "  <status>error</status>\n";
+    print "  <message>Username already exists</message>\n";
+    print "</response>\n";
+} else {
+    # Si no existe, insertamos el nuevo usuario
+    $sth = $dbh->prepare("INSERT INTO Users (username, password, email) VALUES (?, ?, ?)");
+    $sth->execute($username, $password, $email);
+
+    # Devolvemos una respuesta de éxito
+    print $cgi->header('application/xml');
+    print "<response>\n";
+    print "  <status>success</status>\n";
+    print "  <message>User registered successfully</message>\n";
+    print "</response>\n";
 }
 
-# Insertar nuevo usuario en la base de datos
-my $sql = "INSERT INTO users (userName, password, firstName, lastName, email) VALUES (?, ?, ?, ?, ?)";
-my $sth = $dbh->prepare($sql);
-$sth->execute($userName, $password, $firstName, $lastName, $email);  # Incluir el correo en la inserción
-
-# Confirmación y redirección
-print $cgi->header(-location => '/index.html');  # Redirigir al inicio
+# Cerramos la conexión con la base de datos
+$dbh->disconnect;
