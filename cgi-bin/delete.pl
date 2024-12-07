@@ -4,6 +4,10 @@ use warnings;
 use CGI qw(:standard);
 use DBI;
 
+# Crear el objeto CGI
+my $q = CGI->new;
+
+# Imprimir el encabezado HTML
 print $q->header('text/html;charset=UTF-8');
 
 # Obtener el parámetro 'name' desde la solicitud
@@ -37,21 +41,23 @@ if ($@) {
     exit;
 }
 
-# Preparar la consulta para eliminar el registro de la base de datos
-my $sth = $dbh->prepare("DELETE FROM Wiki WHERE name = ?");
-$sth->execute($name) or die "Error al ejecutar la eliminación: $DBI::errstr";
+# Preparar la consulta SQL para eliminar el registro por nombre
+my $sql = "DELETE FROM tabla WHERE name = ?";  # Reemplaza 'tabla' con el nombre de tu tabla
 
-# Comprobar cuántas filas fueron afectadas por la eliminación
-my $affected_rows = $sth->rows;
-if ($affected_rows == 0) {
-    print "<h1>Error: No se encontró una página con el nombre '$name'.</h1>";
-    print "<h2><a href='list.pl'>Volver a la lista</a></h2>";
+# Preparar y ejecutar la consulta
+my $sth = $dbh->prepare($sql);
+$sth->execute($name) or die "Error al ejecutar la consulta: $DBI::errstr";
+
+# Verificar si se eliminó el registro
+if ($sth->rows > 0) {
+    print "<h1>El registro con el nombre '$name' ha sido eliminado exitosamente.</h1>";
 } else {
-    print "<h1>Página '$name' eliminada exitosamente.</h1>";
-    print "<h2><a href='list.pl'>Volver a la lista</a></h2>";
+    print "<h1>Error: No se encontró ningún registro con ese nombre.</h1>";
 }
+
+# Enlace para volver a la lista
+print "<h2><a href='list.pl'>Volver a la lista</a></h2>";
 
 # Cerrar la conexión a la base de datos
 $sth->finish();
 $dbh->disconnect();
-
