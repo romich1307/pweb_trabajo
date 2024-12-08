@@ -1,48 +1,59 @@
 #!/usr/bin/perl
 use CGI;
 use DBI;
-use Digest::SHA qw(sha256_hex);
 use strict;
 use warnings;
 
+# Crear un objeto CGI
 my $cgi = CGI->new;
-print $cgi->header('text/html; charset=UTF-8');
+# Esta línea imprime la cabecera del contenido HTML
 
-# Obtener los parámetros enviados desde el formulario
-my $username = $cgi->param('username');
+# Verifica que el CGI está funcionando correctamente
+print "<h1>Script está funcionando</h1>";
+
+# Establecer el encabezado HTML
+print $cgi->header('text/html', 'charset=UTF-8');
+
+# Obtener datos del formulario
+my $email = $cgi->param('email');
 my $password = $cgi->param('password');
+my $username = $cgi->param('username');
 
-# Verificar que los parámetros no estén vacíos
-if (!$username || !$password) {
-    print "Error: Faltan parámetros (usuario o contraseña).\n";
+# Validar que los campos no estén vacíos
+if (!$email || !$password || !$username) {
+    print "<h2>Todos los campos son obligatorios.</h2>";
+    print "<a href='register.html'>Intenta nuevamente</a>";
     exit;
 }
 
-# Conectar a la base de datos
-my $dbh = DBI->connect("DBI:mysql:database=pweb1;host=172.18.0.2", "alumno", "pweb1", { RaiseError => 1, AutoCommit => 1 })
-    or die "No se pudo conectar a la base de datos: $DBI::errstr";
-
-# Comprobar si el nombre de usuario ya existe
-my $sth_check = $dbh->prepare("SELECT * FROM users WHERE username = ?");
-$sth_check->execute($username);
-
-if ($sth_check->fetchrow_array) {
-    # El nombre de usuario ya existe
-    print "Error: El nombre de usuario ya está registrado.\n";
+# Conexión a la base de datos
+my $dbh;
+eval {
+    $dbh = DBI->connect(
+        "DBI:mysql:database=pweb1;host=db;port=3306",
+        "alumno", "pweb1", 
+        { RaiseError => 1, PrintError => 0 }
+    );
+};
+if ($@) {
+    print "<h2>No se pudo conectar a la base de datos. Intenta más tarde.</h2>";
     exit;
 }
 
-# Hashear la contraseña
-my $hashed_password = sha256_hex($password);
+# Verificar si el email ya existe
+my $sth = $dbh->prepare("SELECT * FROM users WHERE email = ?");
+$sth->execute($email);
+my $row = $sth->fetchrow_hashref;
 
-# Insertar los nuevos datos del usuario en la base de datos
-my $sth_insert = $dbh->prepare("INSERT INTO users (username, password) VALUES (?, ?)");
-$sth_insert->execute($username, $hashed_password);
+if ($row) {
+    print "<h2>Ya tienes una cuenta. <a href='login.html'>Inicia sesión</a></h2>";
+} else {
+    # Insertar el nuevo usuario
+    $sth = $dbh->prepare("INSERT INTO users (email, password, username) VALUES (?, ?, ?)");
+    $sth->execute($email, $password, $username);
+    
+    print "<h2>Te has registrado exitosamente. <a href='login.html'>Inicia sesión</a></h2>";
+}
 
-# Responder al cliente (Éxito)
-print "Registro exitoso. Ahora puede iniciar sesión.\n";
-
-# Cerrar la conexión a la base de datos
-$sth_check->finish;
-$sth_insert->finish;
+# Desconectar de la base de datos
 $dbh->disconnect;

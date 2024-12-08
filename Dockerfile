@@ -2,7 +2,7 @@
 FROM ubuntu:latest
 
 # Actualizar e instalar dependencias necesarias
-RUN apt-get update && apt-get install -y \
+RUN apt-get update -y && apt-get upgrade -y && apt-get install -y \
     perl \
     mariadb-client \
     libdbi-perl \
@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y \
     libmariadb-dev \
     cpanminus \
     libapache2-mod-perl2 \
-    libapache2-mod-php \   # Sin el espacio extra
+    libapache2-mod-php \
     curl \
     nano \
     && rm -rf /var/lib/apt/lists/*
@@ -41,15 +41,11 @@ COPY ./cgi-bin /var/www/html/cgi-bin
 COPY ./*.html /var/www/html/
 COPY ./css /var/www/html/css  
 
-# Reiniciar Apache después de copiar los archivos
-RUN service apache2 restart
+# Cambiar permisos de ejecución para los scripts .pl
+RUN chmod +x /var/www/html/cgi-bin/*.pl
 
-# Establecer permisos adecuados para los archivos y directorios CGI
-RUN chmod -R 755 /var/www/html/cgi-bin \
-    && chown -R www-data:www-data /var/www/html/cgi-bin
-
-# Exponer el puerto 80 para acceder al servidor web
+# Exponer el puerto de Apache
 EXPOSE 80
 
-# Iniciar Apache en primer plano
+# Iniciar Apache en primer plano cuando el contenedor se ejecute
 CMD ["apache2ctl", "-D", "FOREGROUND"]

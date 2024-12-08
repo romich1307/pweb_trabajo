@@ -3,7 +3,7 @@ services:
   web:
     build: .
     ports:
-      - "8022:80"
+      - "8028:80"
     depends_on:
       - db
     networks:
@@ -13,13 +13,13 @@ services:
 
   db:
     build:
-      context: . 
+      context: .
       dockerfile: Dockerfile.db
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: pweb1
-      MYSQL_USER: alumno
-      MYSQL_PASSWORD: pweb1
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}  # Usar la variable de .env
+      MYSQL_DATABASE: ${MYSQL_DATABASE}  # Usar la variable de .env
+      MYSQL_USER: ${MYSQL_USER}  # Usar la variable de .env
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}  # Usar la variable de .env
     ports:
       - "3306:3306"
     networks:

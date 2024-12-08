@@ -1,12 +1,13 @@
 -- Crear base de datos si no existe
-CREATE DATABASE IF NOT EXISTS userdb;
+CREATE DATABASE IF NOT EXISTS pweb1;
 
 -- Seleccionar la base de datos
-USE userdb;
+USE pweb1;
 
 -- Crear tabla 'users' si no existe
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) NOT NULL,
-    password VARCHAR(255) NOT NULL  -- Almacena contraseñas hasheadas
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    username VARCHAR(100) NOT NULL
 );
