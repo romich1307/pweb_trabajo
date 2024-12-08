@@ -16,10 +16,10 @@ services:
       context: .
       dockerfile: Dockerfile.db
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}  # Usar la variable de .env
-      MYSQL_DATABASE: ${MYSQL_DATABASE}  # Usar la variable de .env
-      MYSQL_USER: ${MYSQL_USER}  # Usar la variable de .env
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}  # Usar la variable de .env
+      MYSQL_ROOT_PASSWORD: rootpassword  # Usar la variable de .env
+      MYSQL_DATABASE: pweb1  # Usar la variable de .env
+      MYSQL_USER: alumno  # Usar la variable de .env
+      MYSQL_PASSWORD: pweb1  # Usar la variable de .env
     ports:
       - "3306:3306"
     networks:
