@@ -11,7 +11,7 @@ print $q->header('text/html;charset=UTF-8');
 # Conexión a la base de datos
 my $usuario = 'alumno';
 my $clave = 'pweb1';
-my $dsn = "DBI:MariaDB:database=pweb1;host=172.18.0.2";
+my $dsn = "DBI:MariaDB:database=pweb1;host=db";
 my $dbh = DBI->connect($dsn, $usuario, $clave) or die("No se pudo conectar a la base de datos!");
 
 # Consultar el contenido del título
