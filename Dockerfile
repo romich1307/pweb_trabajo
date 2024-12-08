@@ -12,10 +12,10 @@ RUN apt-get update && apt-get install -y \
     gcc \
     libmariadb-dev \
     cpanminus \
-    libapache2-mod-perl2 \ 
-    libapache2-mod-php \   
-    curl \                  
-    nano \                 
+    libapache2-mod-perl2 \
+    libapache2-mod-php \   # Sin el espacio extra
+    curl \
+    nano \
     && rm -rf /var/lib/apt/lists/*
 
 # Instalar DBD::MariaDB
