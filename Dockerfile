@@ -12,10 +12,10 @@ RUN apt-get update && apt-get install -y \
     gcc \
     libmariadb-dev \
     cpanminus \
-    libapache2-mod-perl2 \ 
-    libapache2-mod-php \   
-    curl \                  
-    nano \                 
+    libapache2-mod-perl2 \
+    libapache2-mod-php \   # Sin el espacio extra
+    curl \
+    nano \
     && rm -rf /var/lib/apt/lists/*
 
 # Instalar DBD::MariaDB
@@ -40,6 +40,7 @@ RUN echo "<VirtualHost *:80>\n\
 COPY ./cgi-bin /var/www/html/cgi-bin
 COPY ./index.html /var/www/html/
 COPY ./new.html /var/www/html/
+COPY ./register.html /var/www/html/ 
 COPY ./css /var/www/html/css  
 
 # Reiniciar Apache después de copiar los archivos

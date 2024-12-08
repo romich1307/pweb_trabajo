@@ -3,15 +3,17 @@ services:
   web:
     build: .
     ports:
-      - "8080:80"
+      - "8022:80"
     depends_on:
       - db
     networks:
       - webnet
+    environment:
+      DB_HOST: db  # Establecer variable de entorno para la base de datos
 
   db:
     build:
-      context: .
+      context: . 
       dockerfile: Dockerfile.db
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
