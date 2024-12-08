@@ -38,8 +38,7 @@ RUN echo "<VirtualHost *:80>\n\
 
 # Copiar archivos CGI, HTML y la carpeta CSS al contenedor
 COPY ./cgi-bin /var/www/html/cgi-bin
-COPY ./index.html /var/www/html/
-COPY ./new.html /var/www/html/
+COPY ./*.html /var/www/html/
 COPY ./css /var/www/html/css  
 
 # Reiniciar Apache después de copiar los archivos
