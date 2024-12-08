@@ -1,45 +1,41 @@
 #!/usr/bin/perl
+use CGI;
+use DBI;
+use Digest::SHA qw(sha256_hex);
 use strict;
 use warnings;
-use DBI;
-use CGI;
 
-# Recibimos los parámetros de la solicitud
 my $cgi = CGI->new;
-my $username = $cgi->param('username');
-my $password = $cgi->param('password');
-my $email = $cgi->param('email');
+print $cgi->header;
 
-# Configuración de la base de datos
-my $usuario = 'alumno';
-my $clave = 'pweb1';
-my $dsn = "DBI:MariaDB:database=pweb1;host=172.18.0.2";
-my $dbh = DBI->connect($dsn, $usuario, $clave) or die("No se pudo conectar a la base de datos!");
+# Verificar si los parámetros 'username' y 'password' están presentes
+if ($cgi->param('username') && $cgi->param('password')) {
+    my $username = $cgi->param('username');
+    my $password = $cgi->param('password');
+    
+    # Hashear la contraseña antes de almacenarla
+    my $hashed_password = sha256_hex($password);
 
-# Comprobamos si el nombre de usuario ya existe
-my $sth = $dbh->prepare("SELECT COUNT(*) FROM Users WHERE username = ?");
-$sth->execute($username);
-my ($exists) = $sth->fetchrow_array;
+    # Conectar a la base de datos
+    my $dbh = DBI->connect("DBI:mysql:database=pweb1;host=172.18.0.2", "alumno", "pweb1", { RaiseError => 1, AutoCommit => 1 })
+    or die "No se pudo conectar a la base de datos: $DBI::errstr";
 
-if ($exists) {
-    # Si el nombre de usuario ya existe, devolvemos un error
-    print $cgi->header('application/xml');
-    print "<response>\n";
-    print "  <status>error</status>\n";
-    print "  <message>Username already exists</message>\n";
-    print "</response>\n";
+
+    # Preparar la consulta para insertar el usuario
+    my $sth = $dbh->prepare("INSERT INTO users (username, password) VALUES (?, ?)");
+    
+    # Ejecutar la consulta con los datos recibidos
+    $sth->execute($username, $hashed_password)
+        or die "Error al registrar el usuario: $sth->errstr";
+
+    # Devolver una respuesta JSON indicando éxito
+    print "Content-type: application/json\n\n";
+    print '{"status": "success", "message": "Usuario registrado correctamente"}';
+    
+    $sth->finish;
+    $dbh->disconnect;
 } else {
-    # Si no existe, insertamos el nuevo usuario
-    $sth = $dbh->prepare("INSERT INTO Users (username, password, email) VALUES (?, ?, ?)");
-    $sth->execute($username, $password, $email);
-
-    # Devolvemos una respuesta de éxito
-    print $cgi->header('application/xml');
-    print "<response>\n";
-    print "  <status>success</status>\n";
-    print "  <message>User registered successfully</message>\n";
-    print "</response>\n";
+    # Si los parámetros no están presentes, devolver un error
+    print "Content-type: application/json\n\n";
+    print '{"status": "error", "message": "Faltan parámetros"}';
 }
-
-# Cerramos la conexión con la base de datos
-$dbh->disconnect;
