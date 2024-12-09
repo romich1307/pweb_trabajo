@@ -1,29 +1,34 @@
+version: '3.8'
+
 services:
   web:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
-      - "8031:80"
+      - "8080:80"
+    volumes:
+      - ./cgi-bin:/usr/lib/cgi-bin
+      - ./css:/var/www/html/css
+      - ./js:/var/www/html/js
+      - ./index.html:/var/www/html/index.html
+      - ./new.html:/var/www/html/new.html
     depends_on:
       - db
-    networks:
-      - webnet
     environment:
-      DB_HOST: db  # Establecer variable de entorno para la base de datos
+      DB_HOST: db
+      DB_NAME: pweb1
+      DB_USER: alumno
+      DB_PASSWORD: pweb1
 
   db:
     build:
       context: .
       dockerfile: Dockerfile.db
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpassword 
-      MYSQL_DATABASE: pweb1  
-      MYSQL_USER: alumno  
-      MYSQL_PASSWORD: pweb1  
+    volumes:
+      - db_data:/var/lib/mysql
     ports:
-      - "3306:3306"
-    networks:
-      - webnet
+      - "3307:3306"
 
-networks:
-  webnet:
-    driver: bridge
+volumes:
+  db_data:
