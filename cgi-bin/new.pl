@@ -2,12 +2,14 @@
 use strict;
 use warnings;
 use CGI;
+use CGI::Session;
 use DBI;
 
-my $q = CGI->new;
-my $name = $q->param('name');
-my $markdown = $q->param('markdown');
+# Configuración CGI y sesión
+my $cgi = CGI->new;
+my $session = CGI::Session->new("driver:File", $cgi, {Directory=>'/tmp'});
 
+<<<<<<< HEAD
 print $q->header('text/html;charset=UTF-8');
 
 # Si se ha recibido el nombre y el contenido, guardar la nueva página en la base de datos
@@ -25,30 +27,48 @@ if ($name && $markdown) {
     
     print "<h1>Página creada con éxito</h1>";
     print "<a href='view.pl?name=$name'>Ver Página</a>";
+=======
+# Verificar si el usuario ha iniciado sesión
+my $owner = $session->param('userName');
+if (!$owner) {
+    print $cgi->header('text/xml');
+    print "<article></article>"; # XML vacío si no está autenticado
+>>>>>>> ca075a2641b6b23bb77081cdaa90151794f2179d
     exit;
 }
 
-print <<FORM;
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../css/styles.css"> <!-- Asegúrate de que la ruta sea correcta -->
-    <title>Crear Nueva Página - Wikipedia</title>
-</head>
-<body>
-    <div class="container">
-        <h1>Crear Nueva Página</h1>
-        <form method="POST" action="new.pl">
-            <label for="name">Nombre:</label>
-            <input type="text" id="name" name="name" required><br>
-            <label for="markdown">Contenido:</label><br>
-            <textarea id="markdown" name="markdown" rows="20" cols="60" required></textarea><br>
-            <input type="submit" value="Crear Página">
-        </form>
-        <p><a href="index.html">Volver al inicio</a></p>
-    </div>
-</body>
-</html>
-FORM
+# Leer datos del formulario
+my $title = $cgi->param('title') || '';
+my $text = $cgi->param('text') || '';
+
+# Verificar datos válidos
+if (!$title || !$text) {
+    print $cgi->header('text/xml');
+    print "<article></article>"; # XML vacío si faltan datos
+    exit;
+}
+
+# Conectar a la base de datos
+my $dsn = "DBI:mysql:database=pweb1;host=localhost";
+my $db_user = "alumno";
+my $db_pass = "pweb1";
+
+my $dbh = DBI->connect($dsn, $db_user, $db_pass, { RaiseError => 1, AutoCommit => 1 });
+
+# Insertar artículo
+my $sth = $dbh->prepare("INSERT INTO Articles (title, text, owner) VALUES (?, ?, ?)");
+eval {
+    $sth->execute($title, $text, $owner);
+};
+if ($@) {
+    print $cgi->header('text/xml');
+    print "<article></article>"; # XML vacío si falla
+    exit;
+}
+
+# Respuesta exitosa
+print $cgi->header('text/xml');
+print "<article><title>$title</title><text>$text</text></article>";
+
+$sth->finish;
+$dbh->disconnect;

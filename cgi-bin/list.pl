@@ -1,48 +1,54 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
-use CGI ":standard";
+use CGI;
+use CGI::Session;
 use DBI;
 
-print "Content-type: text/html\n\n";
-print <<HTML;
-<!DOCTYPE html>
-<html lang="es">
-    <head>
-        <meta charset="utf-8">
-        <title>Listado de Páginas</title>
-        <link rel="stylesheet" href="../css/styles.css">
-    </head>
-    <body>
-    <h1>Páginas de la Wiki</h1>
-HTML
+# Configuración CGI y sesión
+my $cgi = CGI->new;
+my $session = CGI::Session->new("driver:File", $cgi, {Directory=>'/tmp'});
+
+# Verificar si el usuario ha iniciado sesión
+my $owner = $session->param('userName');
+if (!$owner) {
+    print $cgi->header('text/xml');
+    print "<articles></articles>"; # XML vacío si no está autenticado
+    exit;
+}
+
+print "Content-type: text/xml\n\n";
+print "<articles>\n";
 
 # Conexión a la base de datos
+my $dsn = "DBI:MariaDB:database=pweb1;host=localhost";
 my $usuario = 'alumno';
 my $clave = 'pweb1';
+<<<<<<< HEAD
 my $dsn = "DBI:MariaDB:database=pweb1;host=db";
+=======
+>>>>>>> ca075a2641b6b23bb77081cdaa90151794f2179d
 my $dbh = DBI->connect($dsn, $usuario, $clave) or die("No se pudo conectar a la base de datos!");
 
-# Consulta para obtener los nombres de las páginas
-my $sth = $dbh->prepare("SELECT name FROM Wiki");
-$sth->execute();
-print "<ul>\n";
-while(my @row = $sth->fetchrow_array){
-    print "<li>\n";
-    print "<a href='view.pl?name=$row[0]'>$row[0]</a>\n";
-    print "<a href='delete.pl?name=$row[0]'>Eliminar</a>\n";
-    print "<a href='edit.pl?name=$row[0]'>Editar</a>\n";
-    print "</li>\n";
+# Consulta para obtener los artículos del usuario
+my $sth = $dbh->prepare("SELECT title FROM Articles WHERE owner = ?");
+$sth->execute($owner);
+
+while (my @row = $sth->fetchrow_array) {
+    print "  <article>\n";
+    print "    <owner>$owner</owner>\n";
+    print "    <title>$row[0]</title>\n";
+    print "    <links>\n";
+    print "      <edit><a href='edit.pl?name=$row[0]'>Editar</a></edit>\n";
+    print "      <delete><a href='delete.pl?name=$row[0]'>Eliminar</a></delete>\n";
+    print "    </links>\n";
+    print "  </article>\n";
 }
-print "</ul>\n";
+
+if ($sth->rows == 0) {
+    print "<articles></articles>"; # XML vacío si no hay artículos
+}
+
+print "</articles>\n";
 $sth->finish;
 $dbh->disconnect;
-
-print <<HTML;
-    <ul>
-        <li><a href="../new.html">Crear una nueva página</a></li>
-        <li><a href="../index.html">Volver al Inicio</a></li>
-    </ul>
-    </body>
-</html>
-HTML
