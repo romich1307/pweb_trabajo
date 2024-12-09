@@ -9,17 +9,21 @@
 <body>
     <div class="container">
         <h1>Crear una nueva página</h1>
-        <form method="post" action="cgi-bin/new.pl">
-            <h3>Nombre:</h3>
-            <input type="text" name="name" size="20" maxlength="30" placeholder="Ingresa el nombre" required>
-            <h3>Contenido:</h3>
-            <textarea name="markdown" rows="20" cols="60" placeholder="Escribe el contenido aquí..." required></textarea>
-            <br>
-            <input type="submit" value="Guardar página">
-        </form>
+        <form id="newArticleForm">
+            <label for="title">Titulo:</label>
+            <input type="text" id="title" name="title" required>
+            <br><br>
+            
+            <label for="text">Texto:</label>
+            <textarea id="text" name="text" rows="10" cols="30" required></textarea>
+            <br><br>
+            
+            <button type="submit">Crear Articulo</button>
+        </form>        
         <ul>
             <li><a href="index.html">Volver al inicio</a></li>
         </ul>
     </div>
+    <script src="js/new.js"></script>
 </body>
 </html>
