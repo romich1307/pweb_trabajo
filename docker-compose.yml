@@ -1,9 +1,8 @@
-version: '3.8'
 services:
   web:
     build: .
     ports:
-      - "8028:80"
+      - "8029:80"
     depends_on:
       - db
     networks:
