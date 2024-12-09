@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 use CGI;
+use CGI::Carp qw(fatalsToBrowser);
 use CGI::Session;
 use DBI;
 
@@ -21,13 +22,9 @@ print "Content-type: text/xml\n\n";
 print "<articles>\n";
 
 # Conexión a la base de datos
-my $dsn = "DBI:MariaDB:database=pweb1;host=localhost";
 my $usuario = 'alumno';
 my $clave = 'pweb1';
-<<<<<<< HEAD
 my $dsn = "DBI:MariaDB:database=pweb1;host=db";
-=======
->>>>>>> ca075a2641b6b23bb77081cdaa90151794f2179d
 my $dbh = DBI->connect($dsn, $usuario, $clave) or die("No se pudo conectar a la base de datos!");
 
 # Consulta para obtener los artículos del usuario
