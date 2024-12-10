@@ -18,7 +18,7 @@ if (!$owner) {
     exit;
 }
 
-print "Content-type: text/xml\n\n";
+print $cgi->header('text/xml');
 print "<articles>\n";
 
 # Conexión a la base de datos
@@ -40,10 +40,6 @@ while (my @row = $sth->fetchrow_array) {
     print "      <delete><a href='delete.pl?name=$row[0]'>Eliminar</a></delete>\n";
     print "    </links>\n";
     print "  </article>\n";
-}
-
-if ($sth->rows == 0) {
-    print "<articles></articles>"; # XML vacío si no hay artículos
 }
 
 print "</articles>\n";
