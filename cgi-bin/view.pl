@@ -2,11 +2,22 @@
 use strict;
 use warnings;
 use CGI;
+use CGI::Carp qw(fatalsToBrowser);
+use CGI::Session;
 use DBI;
 
-my $q = CGI->new;
-my $name = $q->param('name');
-print $q->header('text/html;charset=UTF-8');
+my $cgi = CGI->new;
+my $session = CGI::Session->new("driver:File", $cgi, {Directory=>'/tmp'});
+
+my $owner = $session->param('userName');
+if (!$owner) {
+    print $cgi->header('application/json', '401 Unauthorized');
+    print '{"error": "No autorizado"}';
+    exit;
+}
+
+my $title = $cgi->param('title');
+print $cgi->header('application/json;charset=UTF-8');
 
 # Conexión a la base de datos
 my $usuario = 'alumno';
@@ -14,32 +25,33 @@ my $clave = 'pweb1';
 my $dsn = "DBI:MariaDB:database=pweb1;host=db";
 my $dbh = DBI->connect($dsn, $usuario, $clave) or die("No se pudo conectar a la base de datos!");
 
-# Consultar el contenido del título
-my $sth = $dbh->prepare("SELECT markdown FROM Wiki WHERE name=?");
-$sth->execute($name);
+# Consultar el contenido del artículo
+my $sth = $dbh->prepare("SELECT markdown FROM Articles WHERE owner=? AND title=?");
+$sth->execute($owner, $title);
 my ($markdown) = $sth->fetchrow_array;
 
 $sth->finish;
 $dbh->disconnect;
 
-# Procesar el contenido Markdown y generar el cuerpo HTML
-my $cuerpo = generarCuerpo($markdown);
+if ($markdown) {
+    my $html_content = generarCuerpo($markdown);
+    print '{"content": ' . json_encode($html_content) . '}';
+} else {
+    print '{"error": "Artículo no encontrado"}';
+}
 
-# Generar la página HTML
-print generarPaginaHTML('Ver Página', $name, $cuerpo);
-
-# Subrutina para generar el cuerpo del HTML a partir del contenido Markdown
+# Subrutina para procesar Markdown y generar HTML
 sub generarCuerpo {
     my $lineas = shift;
     my $texto = "";
-    
+
     # Convertir el Markdown en líneas para procesarlo
     my @lineas_split = split "\n", $lineas;
     my $num_lineas = @lineas_split;
 
     for (my $i = 0; $i < $num_lineas; $i++) {
         my $linea_convertida = "";
-        
+
         # Detectar bloques de código (Markdown: ```)
         if ($lineas_split[$i] =~ /^(```)/) {
             $i++;
@@ -73,7 +85,11 @@ sub procesarLinea {
     }
 
     # Convertir enlaces [texto](URL)
-    while ($linea =~ /(.*)(\[)(.*)(\])(.*)(\()(.*)(\))(.*)/) {
+    while ($linea =~ /(.*)(
+
+\[)(.*)(\]
+
+)(.*)(\()(.*)(\))(.*)/) {
         $linea = "$1<a href='$7'>$3</a>$9";
     }
 
@@ -114,25 +130,11 @@ sub procesarLinea {
     }
 }
 
-# Subrutina para generar el HTML completo de la página
-sub generarPaginaHTML {
-    my ($titulo_pagina, $name, $cuerpo) = @_;
-    my $link_borrar = "<a href='delete.pl?name=$name'>X</a>";
-    my $link_editar = "<a href='edit.pl?name=$name'>E</a>";
-    
-    my $html = <<"HTML";
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <title>$titulo_pagina</title>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="../css/styles.css"> 
-</head>
-<body>
-    <h2><a href="list.pl">Retroceder</a> - $link_borrar $link_editar</h2>
-    $cuerpo
-</body>
-</html>
-HTML
-    return $html;
+sub json_encode {
+    my $string = shift;
+    $string =~ s/"/\\"/g;
+    $string =~ s/\n/\\n/g;
+    $string =~ s/\r/\\r/g;
+    $string =~ s/\t/\\t/g;
+    return '"' . $string . '"';
 }

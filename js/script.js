@@ -61,7 +61,7 @@ document.getElementById('newArticleForm').addEventListener('submit', function(ev
     let text = document.getElementById('text').value;
 
     let xhr = new XMLHttpRequest();
-    xhr.open("POST", "new.pl", true);
+    xhr.open("POST", "/cgi-bin/new.pl", true);
     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
     xhr.onload = function() {
@@ -80,38 +80,54 @@ document.getElementById('newArticleForm').addEventListener('submit', function(ev
 });
 
 // Manejo de visualización de artículos
-document.addEventListener("DOMContentLoaded", function() {
-    document.querySelector('a[href="cgi-bin/list.pl"]').addEventListener('click', function(e) {
-        e.preventDefault();
-        loadArticles();
-    });
-});
-
 function loadArticles() {
     const xhr = new XMLHttpRequest();
     xhr.open("GET", "cgi-bin/list.pl", true);
     xhr.onload = function() {
         if (xhr.status === 200) {
-            const parser = new DOMParser();
-            const xmlDoc = parser.parseFromString(xhr.responseText, "text/xml");
-            const articles = xmlDoc.getElementsByTagName("article");
-            const articlesDiv = document.createElement("div");
-            articlesDiv.id = "articles";
-            document.body.appendChild(articlesDiv);
+            const articles = JSON.parse(xhr.responseText);
+            const articlesDiv = document.getElementById("articles");
             articlesDiv.innerHTML = "";
-            for (let i = 0; i < articles.length; i++) {
-                const owner = articles[i].getElementsByTagName("owner")[0].childNodes[0].nodeValue;
-                const title = articles[i].getElementsByTagName("title")[0].childNodes[0].nodeValue;
-                const editLink = articles[i].getElementsByTagName("edit")[0].childNodes[0].nodeValue;
-                const deleteLink = articles[i].getElementsByTagName("delete")[0].childNodes[0].nodeValue;
-
+            articles.forEach(article => {
                 const articleDiv = document.createElement("div");
                 articleDiv.classList.add("article");
-                articleDiv.innerHTML = `<h3>${title}</h3><p>Owner: ${owner}</p><p>Links: ${editLink} | ${deleteLink}</p>`;
+                articleDiv.innerHTML = `
+                    <h3>${article.title}</h3>
+                    <p>
+                        <button onclick="loadSingleArticle('${article.title}')">Ver</button>
+                        <button onclick="editArticle('${article.title}')">Editar</button>
+                        <button onclick="deleteArticle('${article.title}')">Eliminar</button>
+                    </p>
+                `;
                 articlesDiv.appendChild(articleDiv);
+            });
+        } else {
+            console.error("Error la cargar artículos");
+        }
+    };
+    xhr.onerror = function() {
+        console.error("Request error...");
+    };
+    xhr.send();
+}
+
+// Manejo de visualización de un artículo específico
+function loadSingleArticle(title) {
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", `/cgi-bin/view.pl?title=${encodeURIComponent(title)}`, true);
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            const response = JSON.parse(xhr.responseText);
+            if (response.content) {
+                const articleContentDiv = document.createElement("div");
+                articleContentDiv.id = "articleContent";
+                articleContentDiv.innerHTML = response.content;
+                document.body.appendChild(articleContentDiv);
+            } else {
+                alert('Error al cargar el artículo: ' + response.error);
             }
         } else {
-            console.error("Error la cargar artuculos");
+            console.error("Failed to load article");
         }
     };
     xhr.onerror = function() {
