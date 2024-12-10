@@ -1,32 +1,34 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
-use CGI qw(:standard);
+use CGI;
+use CGI::Session;
 use DBI;
 
 # Crear el objeto CGI
-my $q = CGI->new;
+my $cgi = CGI->new;
+my $session = CGI::Session->new("driver:File", $cgi, {Directory=>'/tmp'});
 
-# Imprimir el encabezado HTML
-print $q->header('text/html;charset=UTF-8');
-
-# Obtener el parámetro 'name' desde la solicitud
-my $name = param('name');
-if (!$name) {
-    print "<h1>Error: No se proporcionó un nombre para eliminar.</h1>";
-    print "<h2><a href='list.pl'>Volver a la lista</a></h2>";
+# Verificar si el usuario ha iniciado sesión
+my $owner = $session->param('userName');
+if (!$owner) {
+    print $cgi->header('text/xml');
+    print "<article></article>"; # XML vacío si no está autenticado
     exit;
 }
 
-# Validar el nombre para evitar inyecciones SQL o caracteres no deseados
-if ($name =~ /[^a-zA-Z0-9_\-]/) {
-    print "<h1>Error: El nombre contiene caracteres no válidos.</h1>";
-    print "<h2><a href='list.pl'>Volver a la lista</a></h2>";
+# Imprimir el encabezado XML
+print $cgi->header('text/xml;charset=UTF-8');
+
+# Obtener los parámetros 'title' desde la solicitud
+my $title = $cgi->param('title');
+if (!$title) {
+    print "<article></article>"; # XML vacío si no se proporcionó un título
     exit;
 }
 
 # Configurar parámetros de conexión a la base de datos
-my $dsn = "DBI:MariaDB:database=pweb1;host=db";  # Cambia 'db' por el nombre del servicio en Docker
+my $dsn = "DBI:MariaDB:database=pweb1;host=db";
 my $user = 'alumno';
 my $password = 'pweb1';
 
@@ -36,27 +38,24 @@ eval {
     $dbh = DBI->connect($dsn, $user, $password, { RaiseError => 1, PrintError => 0 });
 };
 if ($@) {
-    print "<h1>Error: No se pudo conectar a la base de datos.</h1>";
-    print "<h2><a href='list.pl'>Volver a la lista</a></h2>";
+    print "<article></article>"; # XML vacío si no se pudo conectar a la base de datos
     exit;
 }
 
-# Preparar la consulta SQL para eliminar el registro por nombre
-my $sql = "DELETE FROM tabla WHERE name = ?";  # Reemplaza 'tabla' con el nombre de tu tabla
-
-# Preparar y ejecutar la consulta
+# Preparar la consulta SQL para eliminar el artículo por título y propietario
+my $sql = "DELETE FROM Articles WHERE title = ? AND owner = ?";
 my $sth = $dbh->prepare($sql);
-$sth->execute($name) or die "Error al ejecutar la consulta: $DBI::errstr";
+$sth->execute($title, $owner) or die "Error al ejecutar la consulta: $DBI::errstr";
 
-# Verificar si se eliminó el registro
+# Verificar si se eliminó el artículo
 if ($sth->rows > 0) {
-    print "<h1>El registro con el nombre '$name' ha sido eliminado exitosamente.</h1>";
+    print "<article>\n";
+    print "  <title>$title</title>\n";
+    print "  <owner>$owner</owner>\n";
+    print "</article>\n";
 } else {
-    print "<h1>Error: No se encontró ningún registro con ese nombre.</h1>";
+    print "<article></article>"; # XML vacío si no se encontró el artículo
 }
-
-# Enlace para volver a la lista
-print "<h2><a href='list.pl'>Volver a la lista</a></h2>";
 
 # Cerrar la conexión a la base de datos
 $sth->finish();
