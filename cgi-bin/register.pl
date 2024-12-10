@@ -11,16 +11,18 @@ my $query = CGI->new;
 my $email = $query->param('email');
 my $username = $query->param('username');
 my $password = $query->param('password');
+my $first_name = $query->param('firstName');
+my $last_name = $query->param('lastName');
 
 # Validación simple (si falta algún campo, se muestra un mensaje y se queda en la página de registro)
-if (!$email || !$username || !$password) {
+if (!$email || !$username || !$password || !$first_name || !$last_name) {
     print $query->header('text/html');
     print "<html><body><script>alert('Todos los campos son obligatorios.'); window.location.href = '../register.html';</script></body></html>";
     exit;
 }
 
 # Conexión a la base de datos
-my $dsn = "DBI:mysql:database=pweb1;host=db";  # db es el nombre del contenedor
+my $dsn = "DBI:mysql:database=pweb1;host=db";  # Asegúrate de que el host sea correcto
 my $db_user = "alumno";
 my $db_password = "pweb1";
 
@@ -29,19 +31,15 @@ my $dbh = DBI->connect($dsn, $db_user, $db_password, { RaiseError => 1, AutoComm
     or die "No se pudo conectar a la base de datos: $DBI::errstr";
 
 # Preparar la consulta SQL para insertar los datos en la tabla 'Users'
-my $sql = "INSERT INTO Users (email, username, password) VALUES (?, ?, ?)";
+my $sql = "INSERT INTO Users (email, username, password, firstName, lastName) VALUES (?, ?, ?, ?, ?)";
 
-# Preparar la consulta
+# Preparar la consulta SQL
 my $sth = $dbh->prepare($sql);
 
-# Ejecutar la consulta con los datos del formulario
-$sth->execute($email, $username, $password)
-    or die "No se pudo insertar el usuario: $DBI::errstr";
+# Ejecutar la consulta SQL con los parámetros recibidos
+$sth->execute($email, $username, $password, $first_name, $last_name)
+    or die "Error al registrar usuario: $DBI::errstr";
 
-# Cerrar la conexión a la base de datos
-$sth->finish;
-$dbh->disconnect;
-
-# Si los campos son válidos, redirigir al login
+# Confirmación de que se registró correctamente
 print $query->header('text/html');
-print "<html><body><script>window.location.href = '/login.html';</script></body></html>";
+print "<html><body><script>alert('Usuario registrado correctamente.'); window.location.href = '../login.html';</script></body></html>";
