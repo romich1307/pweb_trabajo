@@ -18,7 +18,7 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
         if (xhr.status === 200) {
             console.log('Login successful:', xhr.responseText);
             alert('Sesión iniciada correctamente');
-            window.location.href = 'index.html'; // Redirigir al inicio
+            window.location.href = '../index.html'; // Redirigir al inicio
         } else {
             console.error('Error al iniciar sesión:', xhr.status, xhr.responseText);
             alert('Error al iniciar sesión');
