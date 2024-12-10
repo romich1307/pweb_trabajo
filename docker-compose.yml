@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8080:80"
+      - "8022:80"
     volumes:
       - ./cgi-bin:/usr/lib/cgi-bin
       - ./css:/var/www/html/css
