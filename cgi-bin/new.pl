@@ -9,31 +9,9 @@ use DBI;
 my $cgi = CGI->new;
 my $session = CGI::Session->new("driver:File", $cgi, {Directory=>'/tmp'});
 
-<<<<<<< HEAD
-print $q->header('text/html;charset=UTF-8');
-
-# Si se ha recibido el nombre y el contenido, guardar la nueva página en la base de datos
-if ($name && $markdown) {
-    my $usuario = 'alumno';
-    my $clave = 'pweb1';
-    my $dsn = "DBI:MariaDB:database=pweb1;host=db";
-    my $dbh = DBI->connect($dsn, $usuario, $clave) or die("No se pudo conectar a la base de datos");
-
-    my $sth = $dbh->prepare("INSERT INTO Wiki (name, markdown) VALUES (?, ?)");
-    $sth->execute($name, $markdown);
-
-    $sth->finish;
-    $dbh->disconnect;
-    
-    print "<h1>Página creada con éxito</h1>";
-    print "<a href='view.pl?name=$name'>Ver Página</a>";
-=======
-# Verificar si el usuario ha iniciado sesión
 my $owner = $session->param('userName');
 if (!$owner) {
-    print $cgi->header('text/xml');
-    print "<article></article>"; # XML vacío si no está autenticado
->>>>>>> ca075a2641b6b23bb77081cdaa90151794f2179d
+    print $cgi->redirect('login.html'); # Redirigir a login si no está autenticado
     exit;
 }
 
@@ -49,11 +27,10 @@ if (!$title || !$text) {
 }
 
 # Conectar a la base de datos
-my $dsn = "DBI:mysql:database=pweb1;host=localhost";
-my $db_user = "alumno";
-my $db_pass = "pweb1";
-
-my $dbh = DBI->connect($dsn, $db_user, $db_pass, { RaiseError => 1, AutoCommit => 1 });
+my $usuario = 'alumno';
+my $clave = 'pweb1';
+my $dsn = "DBI:MariaDB:database=pweb1;host=db";
+my $dbh = DBI->connect($dsn, $usuario, $clave, { RaiseError => 1, AutoCommit => 1 }) or die("No se pudo conectar a la base de datos");
 
 # Insertar artículo
 my $sth = $dbh->prepare("INSERT INTO Articles (title, text, owner) VALUES (?, ?, ?)");
