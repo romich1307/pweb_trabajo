@@ -4,11 +4,16 @@ document.getElementById('registerForm').addEventListener('submit', function(even
 
     let email = document.getElementById('email').value;
     let username = document.getElementById('username').value;
+    let firstName = document.getElementById('firstName').value;
+    let lastName = document.getElementById('lastName').value;
     let password = document.getElementById('password').value;
+
 
     // Mostrar los valores en consola para depuración
     console.log("Email:", email);
     console.log("Username:", username);
+    console.log("First Name:", firstName);
+    console.log("Last Name:", lastName);
     console.log("Password:", password);
 
     // Crear la solicitud AJAX para enviar los datos al backend
