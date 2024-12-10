@@ -15,7 +15,7 @@ my $password = $query->param('password');
 # Validación simple (si falta algún campo, se muestra un mensaje y se queda en la página de registro)
 if (!$email || !$username || !$password) {
     print $query->header('text/html');
-    print "<html><body><script>alert('Todos los campos son obligatorios.'); window.location.href = 'register.html';</script></body></html>";
+    print "<html><body><script>alert('Todos los campos son obligatorios.'); window.location.href = '../register.html';</script></body></html>";
     exit;
 }
 
