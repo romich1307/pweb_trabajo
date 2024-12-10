@@ -39,6 +39,10 @@ my $sth = $dbh->prepare($sql);
 # Ejecutar la consulta SQL con los parámetros recibidos
 $sth->execute($email, $username, $password, $first_name, $last_name)
     or die "Error al registrar usuario: $DBI::errstr";
+    
+# Cerrar la conexión a la base de datos
+$sth->finish;
+$dbh->disconnect;
 
 # Confirmación de que se registró correctamente
 print $query->header('text/html');
