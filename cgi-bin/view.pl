@@ -1,5 +1,4 @@
 #!/usr/bin/perl
-
 use DBI;
 use CGI;
 use strict;
@@ -9,45 +8,42 @@ my $q = CGI->new;
 my $owner = $q->param('usuario');
 my $titulo = $q->param('titulo');
 
-# Database connection
 my $user = 'alumno';
 my $password = 'pweb1';
 my $dsn = "DBI:MariaDB:database=pweb1;host=db";
-my $dbh = DBI->connect($dsn, $user, $password) or die("No se pudo conectar: " . DBI::errstr);
+my $dbh = DBI->connect($dsn, $user, $password) or die("No se pudo conectar!");
 
-# Get markdown content
-my $sth = $dbh->prepare("SELECT markdown FROM Articles WHERE owner=? AND title=?") 
-    or die("Error preparing query: " . $dbh->errstr);
-    
-$sth->execute($owner, $titulo) or die("Error executing query: " . $sth->errstr);
-
-my @texto;
-while (my @row = $sth->fetchrow_array) {
-    push (@texto, @row);
-}
-
-print $q->header('text/XML');
-print "<?xml version='1.0' encoding='utf-8'?>\n";
-
-if (!@texto || !defined $texto[0]) {
-    print "<page><error>Article not found</error></page>\n";
-    $sth->finish;
-    $dbh->disconnect;
-    exit;
-}
-
-my @lineas = split "\n", $texto[0];
-my $textoHTML = "";
-
-for my $linea (@lineas) {
-    $textoHTML .= matchLine($linea);
-}
-
-print "<page>\n";
-print $textoHTML;
-print "</page>\n";
-
+# Obtener el ID del usuario
+my $sth = $dbh->prepare("SELECT id FROM Users WHERE username=?");
+$sth->execute($owner);
+my ($owner_id) = $sth->fetchrow_array;
 $sth->finish;
+
+if ($owner_id) {
+    $sth = $dbh->prepare("SELECT markdown FROM Articles WHERE owner=? AND title=?");
+    $sth->execute($owner_id, $titulo);
+    my @texto = $sth->fetchrow_array;
+    $sth->finish;
+
+    print $q->header('text/XML');
+    print "<?xml version='1.0' encoding='utf-8'?>\n";
+
+    if (@texto && defined $texto[0]) {
+        my @lineas = split "\n", $texto[0];
+        print "<page>\n";
+        for my $linea (@lineas) {
+            print matchLine($linea);
+        }
+        print "</page>\n";
+    } else {
+        print "<page><error>Article not found</error></page>\n";
+    }
+} else {
+    print $q->header('text/XML');
+    print "<?xml version='1.0' encoding='utf-8'?>\n";
+    print "<error>Usuario no encontrado</error>\n";
+}
+
 $dbh->disconnect;
 
 sub matchLine {
@@ -55,7 +51,6 @@ sub matchLine {
     
     return "" if $linea =~ /^\s*$/;  # Skip empty lines
     
-    # Process Markdown
     # Headers
     if ($linea =~ /^(\#{6})\s+(.*)/) {
         return "<h6>$2</h6>\n";
