@@ -58,6 +58,7 @@ SELECT * FROM Articles;
 ```
 
 ### Estructura del Proyecto
+```
 .
 ├── cgi-bin/           # Scripts Perl CGI
 ├── css/              # Hojas de estilo
@@ -65,3 +66,4 @@ SELECT * FROM Articles;
 ├── db/               # Inicialización BD
 ├── Dockerfile        # Configuración servidor
 └── docker-compose.yml # Orquestación
+```
