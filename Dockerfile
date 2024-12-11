@@ -6,7 +6,6 @@ RUN apt-get update && apt-get upgrade -y && DEBIAN_FRONTEND="noninteractive" apt
     apache2 \
     perl \
     mariadb-client \
-    default-mysql-client \ 
     libdbi-perl \
     libcgi-pm-perl \
     make \
@@ -23,7 +22,7 @@ RUN apt-get update && apt-get upgrade -y && DEBIAN_FRONTEND="noninteractive" apt
     && rm -rf /var/lib/apt/lists/* \
     && cpanm --notest DBD::MariaDB \
     && a2enmod cgid
-
+    
 # Configuración de Apache con ajustes para CGI
 RUN echo '<VirtualHost *:80>\n\
     ServerName localhost\n\
