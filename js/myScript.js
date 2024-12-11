@@ -57,7 +57,6 @@ function doLogin(){
  * indicando que los datos de usuario y contraseña no coinciden.
  */
 function loginResponse(xml) {
-    // First check if we have a valid XML response
     if (!xml || !xml.getElementsByTagName('user')[0]) {
         document.getElementById("usuario").value = "";
         document.getElementById("password").value = "";
@@ -68,9 +67,9 @@ function loginResponse(xml) {
     const userTag = xml.getElementsByTagName('user')[0];
     const ownerElement = userTag.getElementsByTagName('owner')[0];
     
-    // Check if we have a valid owner ID
     if (ownerElement && ownerElement.textContent.trim()) {
-        userKey = ownerElement.textContent;
+        // Set userKey to username instead of ID
+        userKey = document.getElementById("usuario").value; // Use username instead of ID
         let firstName = userTag.getElementsByTagName('firstName')[0].textContent;
         let lastName = userTag.getElementsByTagName('lastName')[0].textContent;
         
