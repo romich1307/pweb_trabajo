@@ -231,7 +231,6 @@ function showList(xml) {
     
     document.getElementById("main").innerHTML = html;
 }
-
 /**
  * Esta función deberá generar un formulario para la creación de un nuevo
  * artículo, el formulario deberá tener dos botones
