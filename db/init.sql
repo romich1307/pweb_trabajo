@@ -1,6 +1,6 @@
 CREATE DATABASE IF NOT EXISTS pweb1;
-
 USE pweb1;
+
 CREATE TABLE IF NOT EXISTS Users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(255) NOT NULL UNIQUE,
@@ -19,5 +19,7 @@ CREATE TABLE IF NOT EXISTS Articles (
     FOREIGN KEY (owner) REFERENCES Users(id) ON DELETE CASCADE
 );
 
+-- Grant all privileges with proper host specification
 GRANT ALL PRIVILEGES ON pweb1.* TO 'alumno'@'%' IDENTIFIED BY 'pweb1';
+GRANT ALL PRIVILEGES ON pweb1.* TO 'alumno'@'localhost' IDENTIFIED BY 'pweb1';
 FLUSH PRIVILEGES;
