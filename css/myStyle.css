@@ -1,4 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fascinate+Inline&display=swap');
+
 
 * {
     box-sizing: border-box;
@@ -6,7 +8,6 @@
     padding: 0;
     transition: all 0.3s ease;
 }
-
 body {
     font-family: 'Montserrat', sans-serif;
     background: #f1e1c6;
@@ -22,11 +23,13 @@ body {
 }
 
 .header h1 {
+    font-family: 'Fascinate Inline', cursive;
     color: #6f4f3d;
     margin-bottom: 0.8rem;
     font-weight: 700;
     letter-spacing: 0.5px;
     text-transform: uppercase;
+    font-size: 3.5rem; 
 }
 
 .header h2 {
@@ -34,6 +37,7 @@ body {
     font-weight: 400;
     font-size: 1.2rem;
     opacity: 0.9;
+    font-size: 1.85rem; 
 }
 
 /* Navigation */
@@ -106,4 +110,32 @@ input:focus, textarea:focus {
     border-color: #6f4f3d;
     outline: none;
     box-shadow: 0 0 0 3px rgba(111,79,61,0.1);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 20px; /* Reduced width */
+}
+
+::-webkit-scrollbar-track {
+    background: #F8F4E1;
+    border-radius: 20px; /* More rounded */
+    margin: 4px 0; /* Add some spacing */
+}
+
+::-webkit-scrollbar-thumb {
+    background: #AF8F6F;
+    border-radius: 20px; /* More rounded */
+    border: 1px solid #F8F4E1; /* Thinner border */
+    min-height: 10px; /* Minimum height for thumb */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #74512D;
+}
+
+/* Firefox scrollbar */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #AF8F6F #F8F4E1;
 }
