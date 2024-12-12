@@ -3,9 +3,11 @@ USE pweb1;
 
 CREATE TABLE IF NOT EXISTS Users (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    email VARCHAR(255) NOT NULL UNIQUE,
+    username VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    username VARCHAR(100) NOT NULL UNIQUE 
+    firstName VARCHAR(255) NOT NULL,
+    lastName VARCHAR(255) NOT NULL,
+    UNIQUE KEY unique_user (username)
 );
 
 CREATE TABLE IF NOT EXISTS Articles (
