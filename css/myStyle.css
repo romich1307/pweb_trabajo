@@ -158,3 +158,12 @@ input:focus, textarea:focus {
     scrollbar-width: thin;
     scrollbar-color: #AF8F6F #F8F4E1;
 }
+.footer {
+    background-color:#d1c4a1; 
+    color: #74512D;          
+    text-align: center;  
+    padding: 20px;        
+    position: relative;    
+    bottom: 0;
+    width: 100%;
+}
