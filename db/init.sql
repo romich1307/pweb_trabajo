@@ -20,6 +20,6 @@ CREATE TABLE IF NOT EXISTS Articles (
 );
 
 
-CREATE USER IF NOT EXISTS 'alumno'@'%' IDENTIFIED BY 'pweb1';
-GRANT ALL PRIVILEGES ON pweb1.* TO 'alumno'@'%';
+GRANT ALL PRIVILEGES ON pweb1.* TO 'alumno'@'%' IDENTIFIED BY 'pweb1';
+GRANT ALL PRIVILEGES ON pweb1.* TO 'alumno'@'localhost' IDENTIFIED BY 'pweb1';
 FLUSH PRIVILEGES;
