@@ -388,15 +388,15 @@ function responseEdit(xml){
 
   let titulo = xml.children[0].children[1].textContent; // titulo
   let cuerpo = xml.children[0].children[2].textContent; // cuerpo-markdown
-  console.log(titulo);
-  console.log(xml.children[0]);
-  let showUpdate = `<h2>${titulo}</h2>
-  <p>Contenido-markdown</p>
-  <textarea style = "width: 100%;" type="text" id ="cuerpo" name="cuerpo">${cuerpo}</textarea><br>
-  <button onclick='doUpdate("${titulo}")'>Actualizar Pagina</button>
-  <button onclick='doList()'>Cancelar</button>`;
+    console.log(titulo);
+    console.log(xml.children[0]);
+    let showUpdate = `<h2>${titulo}</h2>
+    <p>Contenido-markdown</p>
+    <textarea style = "width: 100%;" type="text" id ="cuerpo" name="cuerpo">${cuerpo}</textarea><br>
+    <button onclick='doUpdate("${titulo}")'>Actualizar Pagina</button>
+    <button onclick='doList()'>Cancelar</button>`;
 
-  document.getElementById("main").innerHTML = showUpdate;
+    document.getElementById("main").innerHTML = showUpdate;
 
 }
 /*
@@ -424,4 +424,3 @@ function doUpdate(title){
 
 
 }
-
