@@ -54,6 +54,7 @@ COPY ./cgi-bin/ /usr/lib/cgi-bin/
 COPY ./*.html /var/www/html/
 COPY ./css /var/www/html/css
 COPY ./js /var/www/html/js
+COPY img/ /var/www/html/img/
 
 # Asegurar permisos correctos para scripts CGI y directorios
 RUN chmod -R 755 /usr/lib/cgi-bin && \
