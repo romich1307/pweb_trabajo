@@ -11,11 +11,12 @@ CREATE TABLE IF NOT EXISTS Users (
 );
 
 CREATE TABLE IF NOT EXISTS Articles (
-    title VARCHAR(255) NOT NULL,      
-    owner VARCHAR(100) NOT NULL,     
-    text TEXT NOT NULL,              
-    PRIMARY KEY (title, owner),      
-    FOREIGN KEY (owner) REFERENCES Users(username) 
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    owner INT NOT NULL, 
+    title VARCHAR(255) NOT NULL,
+    markdown TEXT NOT NULL,                   
+    UNIQUE KEY unique_article (owner, title),    
+    FOREIGN KEY (owner) REFERENCES Users(id) ON DELETE CASCADE 
 );
 
 
