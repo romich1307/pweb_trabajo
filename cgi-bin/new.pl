@@ -1,51 +1,39 @@
 #!/usr/bin/perl
+use DBI;
+use CGI;
 use strict;
 use warnings;
-use CGI;
-use CGI::Session;
-use DBI;
 
-# Configuración CGI y sesión
-my $cgi = CGI->new;
-my $session = CGI::Session->new("driver:File", $cgi, {Directory=>'/tmp'});
+my $q = CGI->new;
+my $owner = $q->param("usuario");
+my $titulo = $q->param("titulo");
+my $markdown = $q->param("cuerpo");
 
-my $owner = $session->param('userName');
-if (!$owner) {
-    print $cgi->redirect('login.html'); # Redirigir a login si no está autenticado
-    exit;
-}
-
-# Leer datos del formulario
-my $title = $cgi->param('title') || '';
-my $text = $cgi->param('text') || '';
-
-# Verificar datos válidos
-if (!$title || !$text) {
-    print $cgi->header('text/xml');
-    print "<article></article>"; # XML vacío si faltan datos
-    exit;
-}
-
-# Conectar a la base de datos
-my $usuario = 'alumno';
-my $clave = 'pweb1';
+my $user = 'alumno';
+my $password = 'pweb1';
 my $dsn = "DBI:MariaDB:database=pweb1;host=db";
-my $dbh = DBI->connect($dsn, $usuario, $clave, { RaiseError => 1, AutoCommit => 1 }) or die("No se pudo conectar a la base de datos");
+my $dbh = DBI->connect($dsn, $user, $password) or die("No se pudo conectar!");
 
-# Insertar artículo
-my $sth = $dbh->prepare("INSERT INTO Articles (title, text, owner) VALUES (?, ?, ?)");
-eval {
-    $sth->execute($title, $text, $owner);
-};
-if ($@) {
-    print $cgi->header('text/xml');
-    print "<article></article>"; # XML vacío si falla
-    exit;
+# Obtener el ID del usuario
+my $sth = $dbh->prepare("SELECT id FROM Users WHERE username=?");
+$sth->execute($owner);
+my ($owner_id) = $sth->fetchrow_array;
+$sth->finish;
+
+if ($owner_id) {
+    $sth = $dbh->prepare("INSERT INTO Articles (owner, title, markdown) VALUES (?, ?, ?)");
+    $sth->execute($owner_id, $titulo, $markdown);
+    print $q->header('text/XML');
+    print "<?xml version='1.0' encoding='utf-8'?>\n";
+    print "<article>\n";
+    print "<title>$titulo</title>\n";
+    print "<text>$markdown</text>\n";
+    print "</article>\n";
+    $sth->finish;
+} else {
+    print $q->header('text/XML');
+    print "<?xml version='1.0' encoding='utf-8'?>\n";
+    print "<error>Usuario no encontrado</error>\n";
 }
 
-# Respuesta exitosa
-print $cgi->header('text/xml');
-print "<article><title>$title</title><text>$text</text></article>";
-
-$sth->finish;
 $dbh->disconnect;
