@@ -122,3 +122,73 @@ function doCreateAccount(){
 
 
 }
+
+
+/*
+ * Esta función invocará al CGI list.pl usando el nombre de usuario 
+ * almacenado en la variable userKey
+ * La respuesta del CGI debe ser procesada por showList
+ */
+function doList(){
+    if (!userKey) {
+        console.error("No user logged in");
+        document.getElementById("main").innerHTML = "<p>Por favor inicie sesión</p>";
+        return;
+    }
+
+    let url = `${SERVER_URL}/cgi-bin/list.pl?usuario=${userKey}`;
+    console.log("Listing articles for user:", userKey);
+    
+    let xhr = new XMLHttpRequest();
+    xhr.open("GET", url, true);
+    xhr.send();
+
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            showList(xhr.responseXML);
+        } else {
+            console.error("Error loading list:", xhr.status);
+            document.getElementById("main").innerHTML = "<p>Error al cargar la lista</p>";
+        }
+    };
+}
+
+/**
+ * Esta función recibe un objeto XML con la lista de artículos de un usuario
+ * y la muestra incluyendo:
+ * - Un botón para ver su contenido, que invoca a doView.
+ * - Un botón para borrarla, que invoca a doDelete.
+ * - Un botón para editarla, que invoca a doEdit.
+ * En caso de que lista de páginas esté vacia, deberá mostrar un mensaje
+ * indicándolo.
+ */
+function showList(xml) {
+    if (!xml || !xml.children[0]) {
+        document.getElementById("main").innerHTML = "<p>No hay páginas creadas</p>";
+        return;
+    }
+
+    const articlesTag = xml.children[0];
+    let html = "";
+
+    if (articlesTag.children.length === 0) {
+        html = "<p>No hay páginas creadas</p>";
+    } else {
+        html = "<ul>";
+        for (let i = 0; i < articlesTag.children.length; i++) {
+            let article = articlesTag.children[i];
+            let owner = article.getElementsByTagName("owner")[0].textContent;
+            let title = article.getElementsByTagName("title")[0].textContent;
+            
+            html += `<li>
+                ${title}
+                <button onclick="doView('${owner}','${title}')">Ver</button>
+                <button onclick="doEdit('${owner}','${title}')">Editar</button>
+                <button onclick="doDelete('${owner}','${title}')">Borrar</button>
+            </li>`;
+        }
+        html += "</ul>";
+    }
+    
+    document.getElementById("main").innerHTML = html;
+}
