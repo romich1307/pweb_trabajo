@@ -4,46 +4,56 @@ use warnings;
 use CGI;
 use DBI;
 
-# Crear una instancia de CGI para obtener los parámetros del formulario
-my $query = CGI->new;
+my $q = CGI->new;
+my $nombres = $q->param('Nombre');
+my $apellidos = $q->param('Apellido');
+my $nombreUsuario = $q->param('usuario');
+my $contra = $q->param('password');
 
-# Obtener los datos del formulario
-my $email = $query->param('email');
-my $username = $query->param('username');
-my $password = $query->param('password');
-my $first_name = $query->param('firstName');
-my $last_name = $query->param('lastName');
+# conectamos con la base de datos
+my $user = 'alumno';
+my $password = 'pweb1';
+my $dsn = "DBI:MariaDB:database=pweb1;host=db";
+my $dbh = DBI->connect($dsn, $user, $password) or die("No se puede conectar: " . $DBI::errstr);
 
-# Validación simple (si falta algún campo, se muestra un mensaje y se queda en la página de registro)
-if (!$email || !$username || !$password || !$first_name || !$last_name) {
-    print $query->header('text/html');
-    print "<html><body><script>alert('Todos los campos son obligatorios.'); window.location.href = '../register.html';</script></body></html>";
-    exit;
+# Verificar si el usuario ya existe
+my $sth = $dbh->prepare("SELECT id FROM Users WHERE username=?");
+$sth->execute($nombreUsuario);
+my @row = $sth->fetchrow_array;
+$sth->finish;
+
+print $q->header('text/XML');
+print "<?xml version='1.0' encoding='utf-8'?>\n";
+
+if (@row == 0) {
+    # si no existe el usuario en la base de datos.
+    eval {
+        $sth = $dbh->prepare("INSERT INTO Users (username, password, firstName, lastName) VALUES (?, ?, ?, ?)");
+        $sth->execute($nombreUsuario, $contra, $nombres, $apellidos);
+        
+        # Obtener el ID del usuario recién insertado
+        my $user_id = $dbh->last_insert_id(undef, undef, 'Users', 'id');
+        
+        print "<user>\n";
+        print "<owner>$user_id</owner>\n";
+        print "<firstName>$nombres</firstName>\n";
+        print "<lastName>$apellidos</lastName>\n";
+        print "</user>\n";
+    };
+    if ($@) {
+        print "<user>\n";
+        print "<owner></owner>\n";
+        print "<firstName></firstName>\n";
+        print "<lastName></lastName>\n";
+        print "</user>\n";
+        warn "Error en la inserción: $@";
+    }
+} else {
+    print "<user>\n";
+    print "<owner></owner>\n";
+    print "<firstName></firstName>\n";
+    print "<lastName></lastName>\n";
+    print "</user>\n";
 }
 
-# Conexión a la base de datos
-my $dsn = "DBI:mysql:database=pweb1;host=db";  # Asegúrate de que el host sea correcto
-my $db_user = "alumno";
-my $db_password = "pweb1";
-
-# Establecer la conexión a la base de datos
-my $dbh = DBI->connect($dsn, $db_user, $db_password, { RaiseError => 1, AutoCommit => 1 })
-    or die "No se pudo conectar a la base de datos: $DBI::errstr";
-
-# Preparar la consulta SQL para insertar los datos en la tabla 'Users'
-my $sql = "INSERT INTO Users (email, username, password, firstName, lastName) VALUES (?, ?, ?, ?, ?)";
-
-# Preparar la consulta SQL
-my $sth = $dbh->prepare($sql);
-
-# Ejecutar la consulta SQL con los parámetros recibidos
-$sth->execute($email, $username, $password, $first_name, $last_name)
-    or die "Error al registrar usuario: $DBI::errstr";
-    
-# Cerrar la conexión a la base de datos
-$sth->finish;
 $dbh->disconnect;
-
-# Confirmación de que se registró correctamente
-print $query->header('text/html');
-print "<html><body><script>alert('Usuario registrado correctamente.'); window.location.href = '../login.html';</script></body></html>";
