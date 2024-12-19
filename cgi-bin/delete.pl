@@ -7,56 +7,31 @@ use DBI;
 
 # Crear el objeto CGI
 my $cgi = CGI->new;
-my $session = CGI::Session->new("driver:File", $cgi, {Directory=>'/tmp'});
+my $owner = $q->param('usuario');
+my $titulo = $q->param('titulo');
 
-# Verificar si el usuario ha iniciado sesión
-my $owner = $session->param('userName');
-if (!$owner) {
-    print $cgi->header('text/xml');
-    print "<article></article>"; # XML vacío si no está autenticado
-    exit;
-}
-
-# Imprimir el encabezado XML
-print $cgi->header('text/xml;charset=UTF-8');
-
-# Obtener los parámetros 'title' desde la solicitud
-my $title = $cgi->param('title');
-if (!$title) {
-    print "<article></article>"; # XML vacío si no se proporcionó un título
-    exit;
-}
-
-# Configurar parámetros de conexión a la base de datos
-my $dsn = "DBI:MariaDB:database=pweb1;host=db";
 my $user = 'alumno';
 my $password = 'pweb1';
+my $dsn = "DBI:MariaDB:database=pweb1;host=db";
+my $dbh = DBI->connect($dsn, $user, $password) or die("No se pudo conectar!");
 
-# Intentar establecer la conexión con la base de datos
-my $dbh;
-eval {
-    $dbh = DBI->connect($dsn, $user, $password, { RaiseError => 1, PrintError => 0 });
-};
-if ($@) {
-    print "<article></article>"; # XML vacío si no se pudo conectar a la base de datos
-    exit;
-}
+my $sth = $dbh->prepare("SELECT id FROM Users WHERE username=?");
+$sth->execute($owner);
+my ($owner_id) = $sth->fetchrow_array;
+$sth->finish;
 
-# Preparar la consulta SQL para eliminar el artículo por título y propietario
-my $sql = "DELETE FROM Articles WHERE title = ? AND owner = ?";
-my $sth = $dbh->prepare($sql);
-$sth->execute($title, $owner) or die "Error al ejecutar la consulta: $DBI::errstr";
+print $q->header('text/XML');
+print "<?xml version='1.0' encoding='utf-8'?>\n";
 
-# Verificar si se eliminó el artículo
-if ($sth->rows > 0) {
-    print "<article>\n";
-    print "  <title>$title</title>\n";
-    print "  <owner>$owner</owner>\n";
-    print "</article>\n";
+if ($owner_id) {
+    $sth = $dbh->prepare("DELETE FROM Articles WHERE owner=? AND title=?");
+    if ($sth->execute($owner_id, $titulo)) {
+        print "<success>true</success>\n";
+    } else {
+        print "<error>Error al eliminar el articulo</error>\n";
+    }
 } else {
-    print "<article></article>"; # XML vacío si no se encontró el artículo
+    print "<error>Usuario no encontrado</error>\n";
 }
 
-# Cerrar la conexión a la base de datos
-$sth->finish();
-$dbh->disconnect();
+$dbh->disconnect;
