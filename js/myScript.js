@@ -316,3 +316,22 @@ function responseEdit(xml){
       document.getElementById("main").innerHTML = showUpdate;
   
   }
+
+  function doUpdate(title){
+
+    console.log(title);
+    title = encodeURIComponent(title).replace(/%20/g, "+"); // para reemplazar espacios en el url
+    let cuerpo = encodeURIComponent(document.getElementById("cuerpo").value).replace(/%20/g,"+");
+    console.log(title);
+    let url = `${SERVER_URL}/cgi-bin/update.pl?usuario=${userKey}&titulo=${title}&cuerpo=${cuerpo}`; console.log
+
+    console.log(url);
+    let xhr = new XMLHttpRequest();
+
+    xhr.open("GET", url, true);
+    xhr.send();
+
+    xhr.onload = function () {
+        responseNew(xhr.responseXML); // para verificar si actualizo o no
+    };
+}
