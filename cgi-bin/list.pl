@@ -1,10 +1,8 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
+use DBI;
+use CGI;
 use strict;
 use warnings;
-use CGI;
-use CGI::Carp qw(fatalsToBrowser);
-use CGI::Session;
-use DBI;
 
 y $q = CGI->new;
 my $owner = $q->param("usuario");

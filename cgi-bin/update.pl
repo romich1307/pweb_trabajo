@@ -1,8 +1,8 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
+use DBI;
+use CGI;
 use strict;
 use warnings;
-use CGI ":standard";
-use DBI;
 
 my $q = CGI->new;
 my $owner = $q->param('usuario');

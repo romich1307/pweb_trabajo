@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
 use strict;
 use warnings;
 use CGI;
@@ -6,9 +6,8 @@ use DBI;
 
 #Recibe los párametros del formulario
 my $q = CGI->new;
-my $owner = $q->param('owner');
-my $title = $q->param('title');
-
+my $owner = $q->param("usuario");
+my $titulo = $q->param("titulo");
 
 my $user = 'alumno';
 my $password = 'pweb1';
