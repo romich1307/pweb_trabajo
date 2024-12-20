@@ -251,3 +251,16 @@ function responseNew(xml) {
     }
 }
 
+function doView(owner, title){
+    let url = `${SERVER_URL}/cgi-bin/view.pl?usuario=${owner}&titulo=${title}`;
+
+    let xhr = new XMLHttpRequest();
+
+    xhr.open("GET", url, true);
+    xhr.send();
+
+    xhr.onload = function () {
+        responseView(xhr.responseXML);
+    };
+
+}
