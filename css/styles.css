@@ -125,24 +125,30 @@ textarea:focus {
     outline: none;
     box-shadow: 0 0 0 3px rgba(84,51,16,0.1);
 }
-a:hover {
-    color: #574668;
-    text-decoration: underline;
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 20px;
 }
 
-strong {
-    color: #2c3e50;
+::-webkit-scrollbar-track {
+    background: #F8F4E1;
+    border-radius: 20px;
+    margin: 4px 0;
 }
 
-ul li a {
-    display: inline-block;
-    padding: 10px 20px;
-    border-radius: 5px;
-    background-color: #52517e;
-    color: white;
+::-webkit-scrollbar-thumb {
+    background: #AF8F6F;
+    border-radius: 20px;
+    border: 1px solid #F8F4E1;
+    min-height: 10px;
 }
 
-ul li a:hover {
-    background-color: #8b7691;
+::-webkit-scrollbar-thumb:hover {
+    background: #74512D;
 }
 
+/* Firefox scrollbar */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #AF8F6F #F8F4E1;
+}
