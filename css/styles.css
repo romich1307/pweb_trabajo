@@ -94,7 +94,24 @@ body {
     max-width: 800px;
 }
 
-/* Form Elements */
+button {
+    background: #6f4f3d;
+    color: #f1e1c6;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    padding: 0.8rem 1.8rem;
+    border-radius: 6px;
+    border: 2px solid #6f4f3d;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background: transparent;
+    color: #6f4f3d;
+    transform: translateY(-2px);
+}
+
 input, textarea {
     background: #fff;
     border: 2px solid #d1c4a1;
