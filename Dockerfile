@@ -22,7 +22,7 @@ RUN apt-get update && apt-get upgrade -y && DEBIAN_FRONTEND="noninteractive" apt
     && rm -rf /var/lib/apt/lists/* \
     && cpanm --notest DBD::MariaDB \
     && a2enmod cgid
-
+    
 # Configuración de Apache con ajustes para CGI
 RUN echo '<VirtualHost *:80>\n\
     ServerName localhost\n\
@@ -54,6 +54,7 @@ COPY ./cgi-bin/ /usr/lib/cgi-bin/
 COPY ./*.html /var/www/html/
 COPY ./css /var/www/html/css
 COPY ./js /var/www/html/js
+COPY img/ /var/www/html/img/
 
 # Asegurar permisos correctos para scripts CGI y directorios
 RUN chmod -R 755 /usr/lib/cgi-bin && \
