@@ -61,9 +61,27 @@ body {
     text-align: center;
 }
 
-p {
-    margin: 10px 0;
-    padding: 0 15px;
+.topnav {
+    background-color: #b9a88d;
+    padding: 0.8rem;
+    box-shadow: 0 2px 8px rgba(111,79,61,0.08);
+    display: flex;
+    justify-content: center;
+}
+
+.topnav p {
+    font-weight: 500;
+    color: #6f4f3d;
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    border-radius: 6px;
+    margin: 0 0.4rem;
+    transition: all 0.3s ease;
+}
+
+.topnav p:hover {
+    background-color: #d1c4a1;
+    transform: translateY(-2px);
 }
 
 ul {
