@@ -1,8 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
+
+use DBI;
+use CGI;
 use strict;
 use warnings;
-use CGI;
-use DBI;
 
 my $q = CGI->new;
 my $nombres = $q->param('Nombre');
@@ -26,7 +27,7 @@ print $q->header('text/XML');
 print "<?xml version='1.0' encoding='utf-8'?>\n";
 
 if (@row == 0) {
-    # si no existe el usuario en la base de datos.
+    # si no existe el usuario en la base de datos...
     eval {
         $sth = $dbh->prepare("INSERT INTO Users (username, password, firstName, lastName) VALUES (?, ?, ?, ?)");
         $sth->execute($nombreUsuario, $contra, $nombres, $apellidos);
