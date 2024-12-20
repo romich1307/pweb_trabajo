@@ -192,3 +192,17 @@ function showList(xml) {
     
     document.getElementById("main").innerHTML = html;
 }
+
+// Muestra el formulario para crear un nuevo artículo
+function showNew(){
+
+    let showNew = `<p>Titulo</p>
+    <input id='titulo' name='titulo' type='text'><br>
+    <p>Contenido-markdown</p>
+    <textarea id="cuerpo" name="cuerpo"></textarea><br>
+    <button onclick='doNew()'>Enviar</button>
+    <button onclick='doList()'>Cancelar</button>`;
+    
+    document.getElementById("main").innerHTML = showNew;
+
+}
