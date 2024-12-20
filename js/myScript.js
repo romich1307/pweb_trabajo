@@ -242,3 +242,12 @@ function doNew(){
     };
 }
 
+function responseNew(xml) {
+    if(xml && xml.getElementsByTagName('article')[0]) {
+        console.log("Article created successfully");
+        doList(); // Refresh the list after creation
+    } else {
+        alert('Error al crear la página');
+    }
+}
+
