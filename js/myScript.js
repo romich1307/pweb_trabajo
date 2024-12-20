@@ -264,3 +264,11 @@ function doView(owner, title){
     };
 
 }
+
+function responseView(response){
+
+    let pag = response.children[0];
+    console.log(pag);
+  
+    document.getElementById("main").innerHTML = pag.innerHTML;
+}
