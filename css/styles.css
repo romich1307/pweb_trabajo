@@ -10,12 +10,9 @@
 
 body {
     font-family: 'Montserrat', sans-serif;
+    background: #f1e1c6;
     line-height: 1.6;
-    background-color: #f0f0f0;
-    color: #333;
-    margin: 0;
-    padding: 0;
-    align-items: center;
+    color: #6f4f3d;
 }
 
 h1, h2 {
