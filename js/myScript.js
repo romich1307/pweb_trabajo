@@ -272,3 +272,17 @@ function responseView(response){
   
     document.getElementById("main").innerHTML = pag.innerHTML;
 }
+
+function doDelete(owner, title){
+
+    let url = `${SERVER_URL}/cgi-bin/delete.pl?usuario=${owner}&titulo=${title}`;
+    let xhr = new XMLHttpRequest();
+
+    xhr.open("GET", url, true);
+    xhr.send();
+
+    xhr.onload = function () {
+        doList();
+    };
+
+}
