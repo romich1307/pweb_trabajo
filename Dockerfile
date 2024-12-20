@@ -6,7 +6,6 @@ RUN apt-get update && apt-get upgrade -y && DEBIAN_FRONTEND="noninteractive" apt
     apache2 \
     perl \
     mariadb-client \
-    default-mysql-client \ 
     libdbi-perl \
     libcgi-pm-perl \
     make \
@@ -64,6 +63,10 @@ RUN chmod -R 755 /usr/lib/cgi-bin && \
 
 # Configurar AppArmor para permitir la ejecución de scripts CGI
 RUN ln -s /bin/true /etc/apparmor.d/usr.sbin.apache2
+
+# Comando adicional para listar permisos (solo para depuración)
+RUN ls -l /usr/lib/cgi-bin && ls -l /var/www/html
+RUN echo "AddType application/javascript .js" >> /etc/apache2/apache2.conf
 
 # Exponer el puerto de Apache
 EXPOSE 80

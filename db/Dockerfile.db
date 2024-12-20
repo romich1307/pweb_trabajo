@@ -2,10 +2,12 @@
 FROM mariadb:latest
 
 # Establecer variables de entorno para la base de datos
-ENV MYSQL_ROOT_PASSWORD=rootpassword
+ENV MYSQL_ROOT_PASSWORD=pweb1
 ENV MYSQL_DATABASE=pweb1
 ENV MYSQL_USER=alumno
 ENV MYSQL_PASSWORD=pweb1
+
+RUN apt-get update && apt-get install -y mariadb-client
 
 # Copiar archivo init.sql al contenedor
 COPY ./init.sql /docker-entrypoint-initdb.d/
