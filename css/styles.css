@@ -94,43 +94,36 @@ body {
     max-width: 800px;
 }
 
-input[type="text"],
-textarea {
-    width: 50%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 1em;
+/* Form Elements */
+input, textarea {
+    background: #fff;
+    border: 2px solid #d1c4a1;
+    padding: 1rem;
+    border-radius: 6px;
+    font-family: 'Montserrat', sans-serif;
+    color: #6f4f3d;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+input:focus, textarea:focus {
+    border-color: #6f4f3d;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(111,79,61,0.1);
 }
 
 textarea {
     height: 300px;
-    resize: none;
-}
-.container {
-    display: grid;
-    background-color: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    width: 90%;
-    max-width: 600px;
-    text-align: center;
-    margin: auto;
-}
-input[type="submit"] {
-    background-color: #52517e;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    font-size: 1em;
-    cursor: pointer;
+    min-height: 300px;
+    max-height: 300px;
+    resize: none; 
+    overflow-y: auto; 
 }
 
-input[type="submit"]:hover {
-    background-color: #8b7691;
+textarea:focus {
+    border-color: #74512D;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(84,51,16,0.1);
 }
 a:hover {
     color: #574668;
