@@ -9,9 +9,9 @@ services:
       - "8080:80"
     volumes:
       - ./cgi-bin:/usr/lib/cgi-bin
+      - ./index.html:/var/www/html/index.html
       - ./css:/var/www/html/css
       - ./js:/var/www/html/js:ro
-      - ./index.html:/var/www/html/index.html
     depends_on:
       - db
     environment:
@@ -23,7 +23,7 @@ services:
   db:
     build:
       context: ./db
-      dockerfile: Dockerfile.db
+      dockerfile: Dockerfile
     environment:
       MYSQL_ROOT_PASSWORD: pweb1
       MYSQL_DATABASE: pweb1
@@ -32,13 +32,15 @@ services:
     volumes:
       - db_data:/var/lib/mysql
     ports:
-      - "3387:3306"
+      - "3309:3306"
     command: --default-authentication-plugin=mysql_native_password
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 5s
       timeout: 5s
       retries: 5
+
+
 
 volumes:
   db_data:
