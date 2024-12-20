@@ -24,7 +24,7 @@ function doLogin(){
     xhr.onload = function () { //llamamos a loginResponse
         loginResponse(xhr.responseXML);
     };
-
+    
 }
 
 function loginResponse(xml) {
