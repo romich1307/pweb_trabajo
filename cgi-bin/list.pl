@@ -4,7 +4,7 @@ use CGI;
 use strict;
 use warnings;
 
-y $q = CGI->new;
+my $q = CGI->new;
 my $owner = $q->param("usuario");
 
 my $user = 'alumno';
@@ -12,10 +12,10 @@ my $password = 'pweb1';
 my $dsn = "DBI:MariaDB:database=pweb1;host=db";
 my $dbh = DBI->connect($dsn, $user, $password) or die("No se pudo conectar!");
 
-
 print $q->header('text/XML');
 print "<?xml version='1.0' encoding='utf-8'?>\n";
 
+# Obtener el ID del usuario
 my $sth = $dbh->prepare("SELECT id FROM Users WHERE username=?");
 $sth->execute($owner);
 my ($owner_id) = $sth->fetchrow_array;
@@ -37,4 +37,5 @@ if ($owner_id) {
 } else {
     print "<articles>\n</articles>\n";
 }
+
 $dbh->disconnect;
