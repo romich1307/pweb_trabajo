@@ -206,3 +206,39 @@ function showNew(){
     document.getElementById("main").innerHTML = showNew;
 
 }
+
+function doNew(){
+    let titulo = encodeURIComponent(document.getElementById("titulo").value).replace(/%20/g, "+");
+    let cuerpo = encodeURIComponent(document.getElementById("cuerpo").value).replace(/%20/g,"+");
+    
+    console.log("Creating new article:");
+    console.log("User:", userKey);
+    console.log("Title:", titulo);
+    console.log("Content:", cuerpo);
+    
+    if(!userKey) {
+        alert("Error: No hay usuario logueado");
+        return;
+    }
+    
+    if(!titulo || !cuerpo) {
+        alert("Por favor complete todos los campos");
+        return;
+    }
+    
+    let url = `${SERVER_URL}/cgi-bin/new.pl?usuario=${userKey}&titulo=${titulo}&cuerpo=${cuerpo}`; 
+    console.log("Sending request to:", url);
+    
+    let xhr = new XMLHttpRequest();
+    xhr.open("GET", url, true);
+    xhr.send();
+    
+    xhr.onload = function () {
+        console.log("Response status:", xhr.status);
+        console.log("Response text:", xhr.responseText);
+        if(xhr.status === 200) {
+            responseNew(xhr.responseXML);
+        }
+    };
+}
+
