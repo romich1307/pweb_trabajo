@@ -286,3 +286,18 @@ function doDelete(owner, title){
     };
 
 }
+
+function doEdit(owner, title){
+
+    let url = `${SERVER_URL}/cgi-bin/article.pl?usuario=${owner}&titulo=${title}`;
+    console.log(url);
+    let xhr = new XMLHttpRequest();
+  
+    xhr.open("GET", url, true);
+    xhr.send();
+
+    xhr.onload = function () {
+        responseEdit(xhr.responseXML);
+    };
+
+}
